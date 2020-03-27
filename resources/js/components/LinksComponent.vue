@@ -11,14 +11,19 @@
                     <div>
                         <link-input
                             v-for="(link, i) in links"
-                            :key="i"
+                            :key="getUniqueKey(i)"
                             :index="i"
                             :link="link"
                             @submittedLink="submittedLink"
                         ></link-input>
                     </div>
                     <hr />
-                    <a href="#" class="btn btn-primary">Submit</a>
+                    <a
+                        href="#"
+                        class="btn btn-primary"
+                        @click.prevent="submitLinks"
+                        >Submit</a
+                    >
                 </div>
             </div>
         </div>
@@ -27,20 +32,55 @@
 
 <script>
 import LinkInput from "./LinkInput.vue";
+import axios from "axios";
 
 export default {
+    props: ["user", "injLinks"],
     components: { LinkInput },
 
     data() {
         return {
-            links: [null]
+            links: JSON.parse(this.injLinks.research_sheet)
         };
     },
 
     methods: {
         submittedLink(value, currentLinkIndex) {
-            if (this.links.length <= parseInt(currentLinkIndex) + 1)
-                this.links.unshift(value);
+            let index = parseInt(currentLinkIndex);
+            if (this.links.length <= index + 1) {
+                if (value === null) {
+                    console.log(
+                        "Value is null, you should enter a link: error"
+                    );
+                } else {
+                    this.links.unshift(value);
+                }
+            } else {
+                if (value === null) {
+                    this.links.splice(index, 1);
+                } else {
+                    this.links[index] = value;
+                }
+            }
+            this.submitLinks();
+        },
+
+        submitLinks() {
+            let links = { links: this.links };
+            const vm = this;
+            axios
+                .post("/store-links", links)
+                .then(response => {
+                    vm.signedIn = true;
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        },
+
+        // TO GET UNIQUE Key
+        getUniqueKey(index) {
+            return index + "_" + Date.now();
         }
     }
 };

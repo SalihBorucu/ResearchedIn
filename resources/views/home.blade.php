@@ -2,7 +2,7 @@
 
 @section('content')
 <div id="app">
-
-    <app-component :user="{{ Auth::user() }}"></app-component>
+    {{-- NEED TO CHECK IF LINKS EXIST BEFORE BINDING --}}
+    <app-component :user="{{ Auth::user() }}" :links="{{Auth::user()->link}}"></app-component>
 </div>
 @endsection

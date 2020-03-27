@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+
 class User extends Authenticatable
 {
     use Notifiable;
@@ -36,4 +37,18 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function link(){
+    return $this->hasOne('App\Link');
+    }
+
+    //  public function getIdAttribute($id)
+    // {
+    //   $link = Link::create([
+    //        'user_id' => $id,
+    //        'research_sheet' => json_encode([null]),
+    //      ]);
+
+    //     return view('home');
+    // }
 }

@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <linkedin-window :user="user"></linkedin-window>
-        <links-component></links-component>
+        <links-component :user="user" :injLinks="links"></links-component>
     </div>
 </template>
 
@@ -9,7 +9,7 @@
 import LinkedinWindow from "./LinkedinWindow.vue";
 import LinksComponent from "./LinksComponent.vue";
 export default {
-    props: ["user"],
+    props: ["user", "links"],
 
     components: { LinkedinWindow, LinksComponent },
 

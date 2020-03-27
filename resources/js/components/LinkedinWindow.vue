@@ -3,7 +3,7 @@
         <div class="col">
             <div class="card m-b-30">
                 <h5 class="card-header mt-0">Linkedin Details</h5>
-                <div class="card-body" v-if="!user.linkedin_email">
+                <div class="card-body" v-if="!signedIn">
                     <div class="form-group row">
                         <label
                             for="example-email-input"
@@ -43,20 +43,39 @@
                         >Login to account</a
                     >
                 </div>
+                <div class="card-body" v-else>
+                    <p>Logged in to linkedin as {{ linkedinEmail }}</p>
+                    <a
+                        href="#"
+                        @click.prevent="deleteLoginDetails"
+                        class="btn btn-secondary"
+                        >Logout from this account</a
+                    >
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import axios from "axios";
 export default {
     props: ["user"],
 
     data() {
         return {
-            linkedinEmail: null,
-            linkedinPassword: null
+            linkedinEmail: this.user.linkedin_email,
+            linkedinPassword: this.user.linkedin_password,
+            signedIn: true
         };
+    },
+
+    mounted() {
+        if (this.user.linkedin_email != null) {
+            this.signedIn = true;
+        } else {
+            this.signedIn = false;
+        }
     },
 
     methods: {
@@ -65,16 +84,33 @@ export default {
                 linkedinEmail: this.linkedinEmail,
                 linkedinPassword: this.linkedinPassword
             };
-            console.log(obj);
 
             const vm = this;
+            if (this.linkedinEmail != null) {
+                axios
+                    .post("/store", obj)
+                    .then(response => {
+                        vm.signedIn = true;
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+            } else {
+                console.log("cant be empty");
+            }
+        },
 
-            // axios
-            //     .post("/ajax/INSERT_LINK", obj)
-            //     .then(response => {})
-            //     .catch(err => {
-            //         console.log(err);
-            //     });
+        deleteLoginDetails() {
+            const vm = this;
+
+            axios
+                .post("/delete")
+                .then(response => {
+                    vm.signedIn = false;
+                })
+                .catch(err => {
+                    console.log(err);
+                });
         }
     }
 };

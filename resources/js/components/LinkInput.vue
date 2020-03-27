@@ -30,6 +30,12 @@ export default {
             var pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             var value = e.target.value;
             var currentLinkIndex = this.index;
+            // console.log(value);
+            if (!value) {
+                value = null;
+                this.$emit("submittedLink", value, currentLinkIndex);
+                return;
+            }
 
             if (pattern.test(value)) {
                 this.$emit("submittedLink", value, currentLinkIndex);
