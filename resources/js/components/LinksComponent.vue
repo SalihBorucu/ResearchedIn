@@ -14,14 +14,14 @@
                             :key="getUniqueKey(i)"
                             :index="i"
                             :link="link"
-                            @submittedLink="submittedLink"
+                            :all-links="links"
                         ></link-input>
                     </div>
                     <hr />
                     <a
                         href="#"
                         class="btn btn-primary"
-                        @click.prevent="submitLinks"
+                        @click.prevent="findData"
                         >Submit</a
                     >
                 </div>
@@ -45,39 +45,46 @@ export default {
     },
 
     methods: {
-        submittedLink(value, currentLinkIndex) {
-            let index = parseInt(currentLinkIndex);
-            if (this.links.length <= index + 1) {
-                if (value === null) {
-                    console.log(
-                        "Value is null, you should enter a link: error"
-                    );
-                } else {
-                    this.links.unshift(value);
-                }
-            } else {
-                if (value === null) {
-                    this.links.splice(index, 1);
-                } else {
-                    this.links[index] = value;
-                }
-            }
-            this.submitLinks();
-        },
+        //     submittedLink(value, currentLinkIndex) {
+        //         let index = parseInt(currentLinkIndex);
+        //         if (this.links.length <= index + 1) {
+        //             if (value === null) {
+        //                 console.log(
+        //                     "Value is null, you should enter a link: error"
+        //                 );
+        //                 return;
+        //             } else {
+        //                 this.links.unshift(value);
+        //                 this.findData(value);
+        //             }
+        //         } else {
+        //             if (value === null) {
+        //                 this.links.splice(index, 1);
+        //             } else {
+        //                 if (this.links[index] !== value) {
+        //                     this.links[index] = value;
+        //                     this.findData(value);
+        //                 }
+        //             }
+        //         }
+        //     },
 
-        submitLinks() {
-            let links = { links: this.links };
-            const vm = this;
-            axios
-                .post("/store-links", links)
-                .then(response => {
-                    vm.signedIn = true;
-                })
-                .catch(err => {
-                    console.log(err);
-                });
-        },
-
+        //     findData(value) {
+        //         let link = { value };
+        //         console.log(value);
+        //         const vm = this;
+        //         axios
+        //             .post("/find-data", link)
+        //             .then(response => {
+        //                 console.log(response.data.prospect);
+        //             })
+        //             .catch(err => {
+        //                 console.log(err);
+        //             });
+        //     },
+        // addNewToList(value) {
+        //     this.links.push(value);
+        // },
         // TO GET UNIQUE Key
         getUniqueKey(index) {
             return index + "_" + Date.now();

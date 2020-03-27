@@ -1941,6 +1941,8 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -1960,28 +1962,91 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ["link", "index"],
+  props: ["link", "index", "allLinks"],
   mounted: function mounted() {
-    this.$refs.email.focus();
+    this.$refs.link.focus();
+    console.log("mounted");
+  },
+  data: function data() {
+    return {
+      links: this.allLinks,
+      linkState: null
+    };
+  },
+  watch: {
+    links: function links() {
+      var links = {
+        links: this.links
+      };
+      var vm = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post("/store-links", links).then(function (response) {
+        vm.signedIn = true;
+      })["catch"](function (err) {
+        console.log(err, "couldn't store the data");
+      });
+    }
   },
   methods: {
+    // changeColors() {
+    //     this.linkState = "has-danger";
+    // },
     addNewLink: function addNewLink(e) {
       var pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
       var value = e.target.value;
-      var currentLinkIndex = this.index; // console.log(value);
 
       if (!value) {
         value = null;
-        this.$emit("submittedLink", value, currentLinkIndex);
+        this.submittedLink(value);
         return;
       }
 
       if (pattern.test(value)) {
-        this.$emit("submittedLink", value, currentLinkIndex);
+        this.submittedLink(value);
       } else {
         console.log("that is not a URL buddy.");
       }
+    },
+    submittedLink: function submittedLink(value) {
+      // let index = parseInt();
+      if (this.links.length <= this.index + 1) {
+        if (value === null) {
+          console.log("Value is null, you should enter a link: error");
+          return;
+        } else {
+          // this.$emit("addNewToList", value);
+          this.links.unshift(value);
+          this.findData(value);
+        }
+      } else {
+        if (value === null) {
+          this.links.splice(this.index, 1);
+        } else {
+          if (this.links[this.index] !== value) {
+            this.links[this.index] = value;
+            this.findData(value);
+          }
+        }
+      }
+    },
+    findData: function findData(value) {
+      var link = {
+        value: value
+      };
+      this.linkState = "has-danger";
+      console.log(this.linkState);
+      var vm = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post("/find-data", link).then(function (response) {
+        vm.linkState = "has-success";
+        console.log(response.data.prospect);
+      })["catch"](function (err) {
+        vm.linkState = "has-danger";
+        console.log(err);
+      });
     }
   }
 });
@@ -2163,36 +2228,45 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    submittedLink: function submittedLink(value, currentLinkIndex) {
-      var index = parseInt(currentLinkIndex);
-
-      if (this.links.length <= index + 1) {
-        if (value === null) {
-          console.log("Value is null, you should enter a link: error");
-        } else {
-          this.links.unshift(value);
-        }
-      } else {
-        if (value === null) {
-          this.links.splice(index, 1);
-        } else {
-          this.links[index] = value;
-        }
-      }
-
-      this.submitLinks();
-    },
-    submitLinks: function submitLinks() {
-      var links = {
-        links: this.links
-      };
-      var vm = this;
-      axios__WEBPACK_IMPORTED_MODULE_1___default.a.post("/store-links", links).then(function (response) {
-        vm.signedIn = true;
-      })["catch"](function (err) {
-        console.log(err);
-      });
-    },
+    //     submittedLink(value, currentLinkIndex) {
+    //         let index = parseInt(currentLinkIndex);
+    //         if (this.links.length <= index + 1) {
+    //             if (value === null) {
+    //                 console.log(
+    //                     "Value is null, you should enter a link: error"
+    //                 );
+    //                 return;
+    //             } else {
+    //                 this.links.unshift(value);
+    //                 this.findData(value);
+    //             }
+    //         } else {
+    //             if (value === null) {
+    //                 this.links.splice(index, 1);
+    //             } else {
+    //                 if (this.links[index] !== value) {
+    //                     this.links[index] = value;
+    //                     this.findData(value);
+    //                 }
+    //             }
+    //         }
+    //     },
+    //     findData(value) {
+    //         let link = { value };
+    //         console.log(value);
+    //         const vm = this;
+    //         axios
+    //             .post("/find-data", link)
+    //             .then(response => {
+    //                 console.log(response.data.prospect);
+    //             })
+    //             .catch(err => {
+    //                 console.log(err);
+    //             });
+    //     },
+    // addNewToList(value) {
+    //     this.links.push(value);
+    // },
     // TO GET UNIQUE Key
     getUniqueKey: function getUniqueKey(index) {
       return index + "_" + Date.now();
@@ -2729,24 +2803,26 @@ var render = function() {
     ),
     _vm._v(" "),
     _c("div", { staticClass: "col-sm-10" }, [
-      _c("input", {
-        ref: "email",
-        staticClass: "form-control",
-        attrs: { type: "url", id: "example-url-input" },
-        domProps: { value: _vm.link },
-        on: {
-          blur: _vm.addNewLink,
-          keypress: function($event) {
-            if (
-              !$event.type.indexOf("key") &&
-              _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-            ) {
-              return null
+      _c("div", { staticClass: "something", class: _vm.linkState }, [
+        _c("input", {
+          ref: "link",
+          staticClass: "form-control",
+          attrs: { type: "url", id: "example-url-input" },
+          domProps: { value: _vm.link },
+          on: {
+            blur: _vm.addNewLink,
+            keypress: function($event) {
+              if (
+                !$event.type.indexOf("key") &&
+                _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+              ) {
+                return null
+              }
+              return _vm.addNewLink($event)
             }
-            return _vm.addNewLink($event)
           }
-        }
-      })
+        })
+      ])
     ])
   ])
 }
@@ -2939,8 +3015,7 @@ var render = function() {
             _vm._l(_vm.links, function(link, i) {
               return _c("link-input", {
                 key: _vm.getUniqueKey(i),
-                attrs: { index: i, link: link },
-                on: { submittedLink: _vm.submittedLink }
+                attrs: { index: i, link: link, "all-links": _vm.links }
               })
             }),
             1
@@ -2956,7 +3031,7 @@ var render = function() {
               on: {
                 click: function($event) {
                   $event.preventDefault()
-                  return _vm.submitLinks($event)
+                  return _vm.findData($event)
                 }
               }
             },

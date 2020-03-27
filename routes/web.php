@@ -23,9 +23,11 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 // Ajax
-Route::post('/store', 'Ajax\LinkedinDetailsController@store');
+Route::post('/update', 'Ajax\LinkedinDetailsController@store');
 Route::post('/delete', 'Ajax\LinkedinDetailsController@delete');
-Route::post('/store-links', 'Ajax\LinksController@store');
+Route::post('/store-links', 'Ajax\LinksController@update');
+
+Route::post('/find-data', 'Ajax\LinksController@find');
 
 Route::get('test', function(){
     $dusk = new Dusk;
